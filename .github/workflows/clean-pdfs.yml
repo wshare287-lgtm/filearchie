@@ -1,0 +1,27 @@
+name: Clean PDF Metadata
+
+on:
+  push:
+    paths:
+      - "pdfs/*.pdf"
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ExifTool
+        run: sudo apt-get update && sudo apt-get install -y libimage-exiftool-perl
+
+      - name: Remove PDF metadata
+        run: |
+          mkdir -p cleaned
+          exiftool -all= -o "cleaned/%f.pdf" pdfs/*.pdf
+
+      - name: Upload cleaned PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: cleaned-pdfs
+          path: cleaned/
